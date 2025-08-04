@@ -1,0 +1,40 @@
+name: Build Android APK
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v2
+        with:
+          api-level: 33
+          build-tools: 33.0.2
+          ndk: 25.2.9519653
+          accept-licenses: true
+
+      - name: Build debug APK
+        uses: gradle/gradle-build-action@v2
+        with:
+          gradle-version: '8.2'
+          build-root-directory: android
+          arguments: assembleDebug
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v3
+        with:
+          name: OrcaSlicer-debug-apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk
